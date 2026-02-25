@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ACCESS TERMINAL</title>
+<style>
+body {
+  background-color: black;
+  color: #00ff00;
+  font-family: Consolas, monospace;
+  padding: 20px;
+}
+
+#terminal {
+  white-space: pre-line;
+}
+
+input {
+  background: black;
+  color: #00ff00;
+  border: none;
+  outline: none;
+  font-family: Consolas, monospace;
+}
+</style>
+</head>
+<body>
+
+<div id="terminal"></div>
+
+<script>
+const terminal = document.getElementById("terminal");
+
+function typeText(text, callback) {
+  let i = 0;
+  const interval = setInterval(() => {
+    terminal.innerHTML += text.charAt(i);
+    i++;
+    if (i >= text.length) {
+      clearInterval(interval);
+      if (callback) callback();
+    }
+  }, 40);
+}
+
+function askPassword() {
+  terminal.innerHTML += "\n\nENTER ACCESS CODE: ";
+  
+  const input = document.createElement("input");
+  document.body.appendChild(input);
+  input.focus();
+
+  input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      if (input.value === "PARTY2026") {
+        showInfo();
+      } else {
+        terminal.innerHTML += "\nACCESS DENIED.";
+      }
+      input.remove();
+    }
+  });
+}
+
+function showInfo() {
+  terminal.innerHTML += "\n\nACCESS GRANTED.\n";
+  typeText("\n> LOCATION: SECRET\n> DATE: 30.03.2026\n> MORE INFO LOADING SOON...");
+}
+
+typeText("INITIALIZING SYSTEM...\nACCESS RESTRICTED.", askPassword);
+</script>
+
+</body>
+</html>

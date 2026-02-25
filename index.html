@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>ACCESS TERMINAL</title>
+
 <style>
 body {
   background-color: black;
@@ -53,24 +54,56 @@ function askPassword() {
   input.addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
       if (input.value === "2106") {
+        input.remove();
         showInfo();
       } else {
         terminal.innerHTML += "\nACCESS DENIED.";
+        input.value = "";
       }
-      input.remove();
     }
   });
 }
 
 function showInfo() {
   terminal.innerHTML += "\n\nACCESS GRANTED.\n";
-  typeText("\n> LOCATION: SECRET\n> DATE: 21.06.2026\n> MORE INFO LOADING SOON...");
+  
+  typeText(
+`\n> DATE: 21.06.2026
+> LOCATION: CLASSIFIED
+> STATUS: INVITATION PENDING
+
+\nENTER YOUR EMAIL TO CONFIRM ACCESS:
+`, 
+  askEmail);
+}
+
+function askEmail() {
+  const emailInput = document.createElement("input");
+  document.body.appendChild(emailInput);
+  emailInput.focus();
+
+  emailInput.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      const email = emailInput.value;
+
+      if (email.includes("@")) {
+        terminal.innerHTML += "\n\nSENDING DATA...";
+        
+        setTimeout(() => {
+          window.location.href = "https://forms.gle/s43vTpZyEUiujuxL7";
+        }, 1000);
+
+      } else {
+        terminal.innerHTML += "\nINVALID EMAIL FORMAT.";
+      }
+
+      emailInput.remove();
+    }
+  });
 }
 
 typeText("INITIALIZING SYSTEM...\nACCESS RESTRICTED.", askPassword);
 </script>
 
 </body>
-
 </html>
-

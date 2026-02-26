@@ -2,8 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>CLASSIFIED TERMINAL</title>
-
+<title>CLASSIFIED NODE</title>
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <style>
@@ -15,43 +14,52 @@ body{
   color:#00ff00;
 }
 
-/* MATRIX BACKGROUND */
+/* MATRIX */
 canvas{
   position:fixed;
   top:0;
   left:0;
   z-index:0;
-  opacity:0.25;
+  opacity:0.15;
 }
 
-/* CENTER PANEL */
+/* TERMINAL PANEL */
 #panel{
   position:absolute;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
   width:80%;
-  max-width:900px;
+  max-width:950px;
   height:80vh;
-  background:rgba(0,0,0,0.85);
+  background:rgba(0,0,0,0.92);
   border:2px solid #00ff00;
-  box-shadow:0 0 20px #00ff00;
+  box-shadow:0 0 25px #00ff00;
   padding:20px;
   overflow-y:auto;
   z-index:2;
 }
 
-/* GLITCH EFFECT */
-.glitch{
-  animation:glitch 0.2s linear 5;
+/* LINE STYLE */
+.line{
+  margin-bottom:6px;
+  white-space:pre-wrap;
 }
-@keyframes glitch{
-  0%{transform:translate(0);}
-  20%{transform:translate(-2px,2px);}
-  40%{transform:translate(2px,-2px);}
-  60%{transform:translate(-2px,-2px);}
-  80%{transform:translate(2px,2px);}
-  100%{transform:translate(0);}
+
+/* PROMPT */
+.prompt::before{
+  content:"C:\\SYSTEM> ";
+  color:#00ff00;
+}
+
+/* GLITCH */
+.glitch{
+  animation:rgbglitch 0.25s infinite;
+}
+@keyframes rgbglitch{
+  0%{text-shadow:2px 0 red,-2px 0 blue;}
+  50%{text-shadow:-2px 0 red,2px 0 blue;}
+  100%{text-shadow:2px 0 red,-2px 0 blue;}
 }
 
 input{
@@ -72,28 +80,36 @@ input{
 document.addEventListener("DOMContentLoaded",function(){
 
 const SUPABASE_URL="https://cxkagetcsfcgmdulsmqs.supabase.co";
-const SUPABASE_KEY="ΒΑΛΕ_ΤΟ_ANON_PUBLIC_KEY";
-
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4a2FnZXRjc2ZjZ21kdWxzbXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjY3MjgsImV4cCI6MjA4NzcwMjcyOH0.0e7oIHreYOjZEST4sf0bjn3hI2uzieT8SKAbp-8z2Fw";
 const {createClient}=supabase;
 const db=createClient(SUPABASE_URL,SUPABASE_KEY);
 
 const panel=document.getElementById("panel");
 
-/* SOUND */
 const typeSound=new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
 const errorSound=new Audio("https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3");
 
 function scrollBottom(){panel.scrollTop=panel.scrollHeight;}
 
-function type(text,speed=20){
+function createLine(text="", withPrompt=false){
+  const div=document.createElement("div");
+  div.className="line"+(withPrompt?" prompt":"");
+  div.textContent=text;
+  panel.appendChild(div);
+  scrollBottom();
+  return div;
+}
+
+function typeLine(text,withPrompt=false,speed=18){
   return new Promise(resolve=>{
+    const line=createLine("",withPrompt);
     let i=0;
     const interval=setInterval(()=>{
-      panel.innerHTML+=text.charAt(i);
+      line.textContent+=text.charAt(i);
       typeSound.currentTime=0;
       typeSound.play().catch(()=>{});
-      scrollBottom();
       i++;
+      scrollBottom();
       if(i>=text.length){
         clearInterval(interval);
         resolve();
@@ -102,20 +118,62 @@ function type(text,speed=20){
   });
 }
 
-/* INTRO GLITCH */
-async function intro(){
+/* ===== MOVIE INTRO ===== */
+
+async function movieIntro(){
+
   panel.classList.add("glitch");
-  await type("BOOTING SECURE NODE...\n");
-  await type("INITIALIZING ENCRYPTION...\n");
-  await type("BYPASSING FIREWALL...\n");
-  await type("ACCESSING MAINFRAME...\n\n");
+  await typeLine("BOOT SEQUENCE INITIATED...");
+  await typeLine("SECURE NODE 07 ONLINE");
+  await typeLine("LOADING ENCRYPTION MODULE...");
+  await typeLine("SCANNING NETWORK...");
+  await fakeIPTrace();
+  await typeLine("FIREWALL BREACHED.");
+  await fakeProgress("ACCESSING MAINFRAME");
+  panel.classList.remove("glitch");
+  await typeLine("ACCESS LEVEL: RESTRICTED");
+  await typeLine("");
   askPassword();
 }
 
+/* ===== FAKE IP TRACE ===== */
+
+async function fakeIPTrace(){
+  for(let i=0;i<5;i++){
+    const fakeIP=
+      Math.floor(Math.random()*255)+"."+
+      Math.floor(Math.random()*255)+"."+
+      Math.floor(Math.random()*255)+"."+
+      Math.floor(Math.random()*255);
+    await typeLine("TRACING IP: "+fakeIP);
+  }
+  await typeLine("IP TRACE COMPLETE.");
+}
+
+/* ===== FAKE PROGRESS BAR ===== */
+
+function fakeProgress(label){
+  return new Promise(resolve=>{
+    let percent=0;
+    const line=createLine(label+" [0%]");
+    const interval=setInterval(()=>{
+      percent+=Math.floor(Math.random()*15)+5;
+      if(percent>100) percent=100;
+      line.textContent=label+" ["+percent+"%]";
+      if(percent===100){
+        clearInterval(interval);
+        resolve();
+      }
+    },150);
+  });
+}
+
+/* ===== PASSWORD ===== */
+
 function askPassword(){
-  panel.innerHTML+="ENTER ACCESS CODE: ";
+  const line=createLine("ENTER ACCESS CODE:",true);
   const input=document.createElement("input");
-  panel.appendChild(input);
+  line.appendChild(input);
   input.focus();
 
   input.addEventListener("keydown",function(e){
@@ -125,52 +183,53 @@ function askPassword(){
         accessGranted();
       }else{
         errorSound.play();
-        panel.innerHTML+="\nACCESS DENIED. TRY AGAIN.\n";
+        createLine("ACCESS DENIED. TRY AGAIN.");
         input.value="";
       }
-      scrollBottom();
     }
   });
 }
 
+/* ===== ACCESS GRANTED ===== */
+
 async function accessGranted(){
-  await type("\nACCESS GRANTED.\n");
-  await type("DECRYPTING FILES...\n\n");
-
+  await typeLine("ACCESS GRANTED.");
+  await fakeProgress("DECRYPTING EVENT DOSSIER");
   startCountdown();
-
-  await type("> DATE: 20.06.2026\n");
-  await type("> LOCATION: ENCRYPTED\n");
-  await type("> STATUS: INVITATION PENDING\n\n");
-
+  await typeLine("DATE: 20.06.2026");
+  await typeLine("LOCATION: ENCRYPTED");
+  await typeLine("STATUS: INVITATION PENDING");
+  await typeLine("");
   askEmail();
 }
 
-function startCountdown(){
-  const timer=document.createElement("div");
-  panel.appendChild(timer);
+/* ===== COUNTDOWN ===== */
 
+function startCountdown(){
+  const timer=createLine("EVENT TIMER INITIALIZING...");
   const eventDate=new Date("2026-06-20T00:00:00").getTime();
 
   setInterval(()=>{
     const now=new Date().getTime();
     const diff=eventDate-now;
     if(diff<0){
-      timer.innerText="> EVENT STARTED";
+      timer.textContent="EVENT STARTED.";
       return;
     }
     const d=Math.floor(diff/(1000*60*60*24));
     const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
     const m=Math.floor((diff%(1000*60*60))/(1000*60));
     const s=Math.floor((diff%(1000*60))/1000);
-    timer.innerText="> EVENT TIMER: "+d+"D "+h+"H "+m+"M "+s+"S";
+    timer.textContent="EVENT TIMER: "+d+"D "+h+"H "+m+"M "+s+"S";
   },1000);
 }
 
+/* ===== EMAIL ===== */
+
 function askEmail(){
-  panel.innerHTML+="ENTER YOUR EMAIL TO CONFIRM ACCESS: ";
+  const line=createLine("ENTER YOUR EMAIL TO CONFIRM ACCESS:",true);
   const input=document.createElement("input");
-  panel.appendChild(input);
+  line.appendChild(input);
   input.focus();
 
   input.addEventListener("keydown",async function(e){
@@ -178,36 +237,38 @@ function askEmail(){
       const val=input.value.trim();
 
       if(val==="admin"){
-        panel.innerHTML+="\nACCESSING LEVEL 2...\nDRESS CODE: BLACK.\n";
-        input.remove();
-        scrollBottom();
+        createLine("ACCESSING LEVEL 2...");
+        createLine("DRESS CODE: BLACK.");
+        input.value="";
         return;
       }
 
       if(!val.includes("@")){
         errorSound.play();
-        panel.innerHTML+="\nINVALID EMAIL. TRY AGAIN.\n";
+        createLine("INVALID EMAIL. TRY AGAIN.");
         input.value="";
-        scrollBottom();
         return;
       }
 
-      panel.innerHTML+="\nSTORING DATA...\n";
+      createLine("STORING DATA...");
       const {error}=await db.from("emails").insert([{email:val}]);
 
       if(error){
-        panel.innerHTML+="DATABASE ERROR.\n";
+        createLine("DATABASE ERROR.");
       }else{
-        panel.innerHTML+="EMAIL REGISTERED.\nYOU ARE NOW PART OF THE OPERATION.\n\nSTAY TUNED. MORE INFO TO COME.\n";
+        createLine("EMAIL REGISTERED.");
+        createLine("YOU ARE NOW PART OF THE OPERATION.");
+        createLine("");
+        createLine("STAY TUNED. MORE INFO TO COME.");
       }
 
       input.value="";
-      scrollBottom();
     }
   });
 }
 
-/* MATRIX */
+/* ===== MATRIX ===== */
+
 const canvas=document.getElementById("matrix");
 const ctx=canvas.getContext("2d");
 canvas.height=window.innerHeight;
@@ -233,7 +294,8 @@ function draw(){
 }
 setInterval(draw,33);
 
-intro();
+/* START */
+movieIntro();
 
 });
 </script>

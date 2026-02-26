@@ -82,7 +82,7 @@ input{
 document.addEventListener("DOMContentLoaded",function(){
 
 const SUPABASE_URL="https://cxkagetcsfcgmdulsmqs.supabase.co";
-const SUPABASE_KEY="ΒΑΛΕ_ΤΟ_ANON_PUBLIC_KEY";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4a2FnZXRjc2ZjZ21kdWxzbXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjY3MjgsImV4cCI6MjA4NzcwMjcyOH0.0e7oIHreYOjZEST4sf0bjn3hI2uzieT8SKAbp-8z2Fw";
 
 const {createClient}=supabase;
 const db=createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -212,7 +212,7 @@ async function accessGranted(){
     await typeLine("OPERATION TITLE:");
     await typeLine("KONSTANTINOS & PYRROS BIRTHDAY PARTY");
 
-    await typeLine("DRESS CODE: GLAMOROUS");
+    
 
     await typeLine("DATE: 20.06.2026");
     await typeLine("STATUS: INVITATION PENDING");
@@ -354,3 +354,4 @@ intro();
 
 </body>
 </html>
+

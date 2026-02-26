@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>ACCESS TERMINAL</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 body {
   background-color: black;
@@ -30,6 +32,12 @@ input {
 <div id="terminal"></div>
 
 <script>
+// 🔐 ΒΑΛΕ ΤΑ ΔΙΚΑ ΣΟΥ ΣΤΟΙΧΕΙΑ ΕΔΩ
+const SUPABASE_URL = "https://cxkagetcsfcgmdulsmqs.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4a2FnZXRjc2ZjZ21kdWxzbXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjY3MjgsImV4cCI6MjA4NzcwMjcyOH0.0e7oIHreYOjZEST4sf0bjn3hI2uzieT8SKAbp-8z2Fw";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const terminal = document.getElementById("terminal");
 
 function typeText(text, callback) {
@@ -82,19 +90,25 @@ function askEmail() {
   document.body.appendChild(emailInput);
   emailInput.focus();
 
-  emailInput.addEventListener("keydown", function(e) {
+  emailInput.addEventListener("keydown", async function(e) {
     if (e.key === "Enter") {
       const email = emailInput.value;
 
-      if (email.includes("@")) {
-        terminal.innerHTML += "\n\nSENDING DATA...";
-        
-        setTimeout(() => {
-          window.location.href = "https://forms.gle/s43vTpZyEUiujuxL7";
-        }, 1000);
-
-      } else {
+      if (!email.includes("@")) {
         terminal.innerHTML += "\nINVALID EMAIL FORMAT.";
+        return;
+      }
+
+      terminal.innerHTML += "\n\nSTORING DATA...";
+
+      const { error } = await supabase
+        .from("emails")
+        .insert([{ email: email }]);
+
+      if (error) {
+        terminal.innerHTML += "\nERROR SAVING DATA.";
+      } else {
+        terminal.innerHTML += "\nEMAIL STORED SUCCESSFULLY.";
       }
 
       emailInput.remove();

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>ACCESS TERMINAL</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <style>
 body {
@@ -36,19 +36,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const terminal = document.getElementById("terminal");
 
-  // 🔐 ΒΑΛΕ ΤΑ ΔΙΚΑ ΣΟΥ ΣΤΟΙΧΕΙΑ
-  const SUPABASE_URL = https://cxkagetcsfcgmdulsmqs.supabase.co;
-  const SUPABASE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4a2FnZXRjc2ZjZ21kdWxzbXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjY3MjgsImV4cCI6MjA4NzcwMjcyOH0.0e7oIHreYOjZEST4sf0bjn3hI2uzieT8SKAbp-8z2Fw;
+  const SUPABASE_URL = "https://cxkagetcsfcgmdulsmqs.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4a2FnZXRjc2ZjZ21kdWxzbXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjY3MjgsImV4cCI6MjA4NzcwMjcyOH0.0e7oIHreYOjZEST4sf0bjn3hI2uzieT8SKAbp-8z2Fw";
 
-  if (!window.supabase) {
-    terminal.innerHTML = "ERROR LOADING DATABASE LIBRARY.";
-    return;
-  }
-
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
   function typeText(text, callback) {
     let i = 0;

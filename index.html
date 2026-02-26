@@ -2,85 +2,88 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>CLASSIFIED NODE</title>
+<title>CLASSIFIED OPERATION</title>
+
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <style>
 body{
-  margin:0;
-  background:black;
-  overflow:hidden;
-  font-family:Consolas, monospace;
-  color:#00ff00;
+    margin:0;
+    background:black;
+    overflow:hidden;
+    font-family:Consolas, monospace;
+    color:#00ff00;
 }
 
-/* MATRIX */
+/* MATRIX BACKGROUND */
 canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:0;
-  opacity:0.15;
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:0;
+    opacity:0.15;
 }
 
 /* TERMINAL PANEL */
 #panel{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:80%;
-  max-width:950px;
-  height:80vh;
-  background:rgba(0,0,0,0.92);
-  border:2px solid #00ff00;
-  box-shadow:0 0 25px #00ff00;
-  padding:20px;
-  overflow-y:auto;
-  z-index:2;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:85%;
+    max-width:1000px;
+    height:85vh;
+    background:rgba(0,0,0,0.95);
+    border:2px solid #00ff00;
+    box-shadow:0 0 30px #00ff00;
+    padding:25px;
+    overflow-y:auto;
+    z-index:2;
+    line-height:1.4em;
 }
 
-/* LINE STYLE */
 .line{
-  margin-bottom:6px;
-  white-space:pre-wrap;
+    white-space:pre-wrap;
+    margin-bottom:8px;
 }
 
-/* PROMPT */
 .prompt::before{
-  content:"C:\\SYSTEM> ";
-  color:#00ff00;
+    content:"C:\\OPERATION> ";
 }
 
-/* GLITCH */
+/* GLITCH EFFECT */
 .glitch{
-  animation:rgbglitch 0.25s infinite;
+    animation:glitchAnim 0.25s infinite;
 }
-@keyframes rgbglitch{
-  0%{text-shadow:2px 0 red,-2px 0 blue;}
-  50%{text-shadow:-2px 0 red,2px 0 blue;}
-  100%{text-shadow:2px 0 red,-2px 0 blue;}
+
+@keyframes glitchAnim{
+    0%{text-shadow:2px 0 red,-2px 0 blue;}
+    50%{text-shadow:-2px 0 red,2px 0 blue;}
+    100%{text-shadow:2px 0 red,-2px 0 blue;}
 }
 
 input{
-  background:black;
-  color:#00ff00;
-  border:none;
-  outline:none;
-  font-family:Consolas, monospace;
+    background:black;
+    color:#00ff00;
+    border:none;
+    outline:none;
+    font-family:Consolas, monospace;
 }
 </style>
 </head>
+
 <body>
 
 <canvas id="matrix"></canvas>
 <div id="panel"></div>
 
 <script>
+
 document.addEventListener("DOMContentLoaded",function(){
 
 const SUPABASE_URL="https://cxkagetcsfcgmdulsmqs.supabase.co";
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4a2FnZXRjc2ZjZ21kdWxzbXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjY3MjgsImV4cCI6MjA4NzcwMjcyOH0.0e7oIHreYOjZEST4sf0bjn3hI2uzieT8SKAbp-8z2Fw";
+const SUPABASE_KEY="ΒΑΛΕ_ΤΟ_ANON_PUBLIC_KEY";
+
 const {createClient}=supabase;
 const db=createClient(SUPABASE_URL,SUPABASE_KEY);
 
@@ -89,213 +92,262 @@ const panel=document.getElementById("panel");
 const typeSound=new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
 const errorSound=new Audio("https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3");
 
-function scrollBottom(){panel.scrollTop=panel.scrollHeight;}
-
-function createLine(text="", withPrompt=false){
-  const div=document.createElement("div");
-  div.className="line"+(withPrompt?" prompt":"");
-  div.textContent=text;
-  panel.appendChild(div);
-  scrollBottom();
-  return div;
+function scrollBottom(){
+    panel.scrollTop=panel.scrollHeight;
 }
 
-function typeLine(text,withPrompt=false,speed=18){
-  return new Promise(resolve=>{
-    const line=createLine("",withPrompt);
-    let i=0;
-    const interval=setInterval(()=>{
-      line.textContent+=text.charAt(i);
-      typeSound.currentTime=0;
-      typeSound.play().catch(()=>{});
-      i++;
-      scrollBottom();
-      if(i>=text.length){
-        clearInterval(interval);
-        resolve();
-      }
-    },speed);
-  });
+function createLine(text=""){
+    const div=document.createElement("div");
+    div.className="line";
+    div.textContent=text;
+    panel.appendChild(div);
+    scrollBottom();
+    return div;
 }
 
-/* ===== MOVIE INTRO ===== */
+function typeLine(text,speed=18){
+    return new Promise(resolve=>{
+        const line=createLine("");
+        let i=0;
 
-async function movieIntro(){
+        const interval=setInterval(()=>{
+            line.textContent+=text.charAt(i);
 
-  panel.classList.add("glitch");
-  await typeLine("BOOT SEQUENCE INITIATED...");
-  await typeLine("SECURE NODE 07 ONLINE");
-  await typeLine("LOADING ENCRYPTION MODULE...");
-  await typeLine("SCANNING NETWORK...");
-  await fakeIPTrace();
-  await typeLine("FIREWALL BREACHED.");
-  await fakeProgress("ACCESSING MAINFRAME");
-  panel.classList.remove("glitch");
-  await typeLine("ACCESS LEVEL: RESTRICTED");
-  await typeLine("");
-  askPassword();
+            typeSound.currentTime=0;
+            typeSound.play().catch(()=>{});
+
+            i++;
+
+            scrollBottom();
+
+            if(i>=text.length){
+                clearInterval(interval);
+                resolve();
+            }
+
+        },speed);
+    });
 }
 
-/* ===== FAKE IP TRACE ===== */
+/* ===== FAKE TRACE ===== */
 
-async function fakeIPTrace(){
-  for(let i=0;i<5;i++){
-    const fakeIP=
-      Math.floor(Math.random()*255)+"."+
-      Math.floor(Math.random()*255)+"."+
-      Math.floor(Math.random()*255)+"."+
-      Math.floor(Math.random()*255);
-    await typeLine("TRACING IP: "+fakeIP);
-  }
-  await typeLine("IP TRACE COMPLETE.");
+async function fakeTrace(){
+    await typeLine("TRACING NETWORK SIGNAL...");
+    await typeLine("IP TRACE INITIATED.");
+
+    for(let i=0;i<4;i++){
+        let fakeIP=
+        Math.floor(Math.random()*200)+"."+
+        Math.floor(Math.random()*200)+"."+
+        Math.floor(Math.random()*200)+"."+
+        Math.floor(Math.random()*200);
+
+        await typeLine("TRACE RESULT > "+fakeIP);
+    }
+
+    await typeLine("NETWORK TRACE COMPLETE.");
 }
 
-/* ===== FAKE PROGRESS BAR ===== */
+/* ===== INTRO ===== */
 
-function fakeProgress(label){
-  return new Promise(resolve=>{
-    let percent=0;
-    const line=createLine(label+" [0%]");
-    const interval=setInterval(()=>{
-      percent+=Math.floor(Math.random()*15)+5;
-      if(percent>100) percent=100;
-      line.textContent=label+" ["+percent+"%]";
-      if(percent===100){
-        clearInterval(interval);
-        resolve();
-      }
-    },150);
-  });
+async function intro(){
+
+    panel.classList.add("glitch");
+
+    await typeLine("BOOT SEQUENCE INITIATED...");
+    await typeLine("SECURE NODE ONLINE.");
+    await typeLine("ENCRYPTION ACTIVE.");
+    await typeLine("SCANNING GLOBAL NETWORK...");
+    await fakeTrace();
+    await typeLine("FIREWALL STATUS: BREACHED.");
+    await typeLine("ACCESS LEVEL: RESTRICTED.");
+
+    panel.classList.remove("glitch");
+
+    askPassword();
 }
 
 /* ===== PASSWORD ===== */
 
 function askPassword(){
-  const line=createLine("ENTER ACCESS CODE:",true);
-  const input=document.createElement("input");
-  line.appendChild(input);
-  input.focus();
 
-  input.addEventListener("keydown",function(e){
-    if(e.key==="Enter"){
-      if(input.value==="2006"){
-        input.remove();
-        accessGranted();
-      }else{
-        errorSound.play();
-        createLine("ACCESS DENIED. TRY AGAIN.");
-        input.value="";
-      }
-    }
-  });
+    const line=createLine("ENTER ACCESS CODE:");
+    line.classList.add("prompt");
+
+    const input=document.createElement("input");
+    line.appendChild(input);
+    input.focus();
+
+    input.addEventListener("keydown",function(e){
+
+        if(e.key==="Enter"){
+
+            if(input.value==="2006"){
+                input.remove();
+                accessGranted();
+            }
+            else{
+                errorSound.play();
+                createLine("ACCESS DENIED. TRY AGAIN.");
+                input.value="";
+            }
+        }
+
+    });
 }
 
 /* ===== ACCESS GRANTED ===== */
 
 async function accessGranted(){
-  await typeLine("ACCESS GRANTED.");
-  await fakeProgress("DECRYPTING EVENT DOSSIER");
-  startCountdown();
-  await typeLine("DATE: 20.06.2026");
-  await typeLine("LOCATION: ENCRYPTED");
-  await typeLine("STATUS: INVITATION PENDING");
-  await typeLine("");
-  askEmail();
+
+    await typeLine("ACCESS GRANTED.");
+    await typeLine("DECRYPTING OPERATION DOSSIER...");
+
+    await fakeTrace();
+
+    showFakeLocation();
+
+    startCountdown();
+
+    await typeLine("OPERATION TITLE:");
+    await typeLine("KONSTANTINOS & PYRROS BIRTHDAY PARTY");
+
+    await typeLine("DRESS CODE: GLAMOROUS");
+
+    await typeLine("DATE: 20.06.2026");
+    await typeLine("STATUS: INVITATION PENDING");
+
+    askEmail();
+}
+
+/* ===== FAKE LOCATION ===== */
+
+function showFakeLocation(){
+
+    let lat=(37+Math.random()).toFixed(4);
+    let lon=(23+Math.random()).toFixed(4);
+
+    createLine("GPS SIGNAL SIMULATION...");
+    createLine("LAT: "+lat);
+    createLine("LON: "+lon);
+    createLine("RADIUS ESTIMATE: 20M");
 }
 
 /* ===== COUNTDOWN ===== */
 
 function startCountdown(){
-  const timer=createLine("EVENT TIMER INITIALIZING...");
-  const eventDate=new Date("2026-06-20T00:00:00").getTime();
 
-  setInterval(()=>{
-    const now=new Date().getTime();
-    const diff=eventDate-now;
-    if(diff<0){
-      timer.textContent="EVENT STARTED.";
-      return;
-    }
-    const d=Math.floor(diff/(1000*60*60*24));
-    const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-    const m=Math.floor((diff%(1000*60*60))/(1000*60));
-    const s=Math.floor((diff%(1000*60))/1000);
-    timer.textContent="EVENT TIMER: "+d+"D "+h+"H "+m+"M "+s+"S";
-  },1000);
+    const timer=createLine("EVENT TIMER INITIALIZING...");
+
+    const eventDate=new Date("2026-06-20T00:00:00").getTime();
+
+    setInterval(()=>{
+
+        const now=new Date().getTime();
+        const diff=eventDate-now;
+
+        if(diff<0){
+            timer.textContent="EVENT STARTED.";
+            return;
+        }
+
+        const d=Math.floor(diff/(1000*60*60*24));
+        const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+        const m=Math.floor((diff%(1000*60*60))/(1000*60));
+        const s=Math.floor((diff%(1000*60))/1000);
+
+        timer.textContent=
+        "EVENT TIMER: "+d+"D "+h+"H "+m+"M "+s+"S";
+
+    },1000);
 }
 
 /* ===== EMAIL ===== */
 
 function askEmail(){
-  const line=createLine("ENTER YOUR EMAIL TO CONFIRM ACCESS:",true);
-  const input=document.createElement("input");
-  line.appendChild(input);
-  input.focus();
 
-  input.addEventListener("keydown",async function(e){
-    if(e.key==="Enter"){
-      const val=input.value.trim();
+    const line=createLine("ENTER YOUR EMAIL TO CONFIRM ACCESS:");
+    line.classList.add("prompt");
 
-      if(val==="admin"){
-        createLine("ACCESSING LEVEL 2...");
-        createLine("DRESS CODE: BLACK.");
-        input.value="";
-        return;
-      }
+    const input=document.createElement("input");
+    line.appendChild(input);
+    input.focus();
 
-      if(!val.includes("@")){
-        errorSound.play();
-        createLine("INVALID EMAIL. TRY AGAIN.");
-        input.value="";
-        return;
-      }
+    input.addEventListener("keydown",async function(e){
 
-      createLine("STORING DATA...");
-      const {error}=await db.from("emails").insert([{email:val}]);
+        if(e.key==="Enter"){
 
-      if(error){
-        createLine("DATABASE ERROR.");
-      }else{
-        createLine("EMAIL REGISTERED.");
-        createLine("YOU ARE NOW PART OF THE OPERATION.");
-        createLine("");
-        createLine("STAY TUNED. MORE INFO TO COME.");
-      }
+            const val=input.value.trim();
 
-      input.value="";
-    }
-  });
+            if(!val.includes("@")){
+                errorSound.play();
+                createLine("INVALID EMAIL. TRY AGAIN.");
+                input.value="";
+                return;
+            }
+
+            createLine("STORING DATA...");
+
+            const {error}=await db
+            .from("emails")
+            .insert([{email:val}]);
+
+            if(error){
+                createLine("DATABASE ERROR.");
+            }
+            else{
+                createLine("EMAIL REGISTERED.");
+                createLine("YOU ARE NOW PART OF THE OPERATION.");
+                createLine("");
+                createLine("STAY TUNED. MORE INFO TO COME.");
+            }
+
+            input.value="";
+        }
+
+    });
 }
 
 /* ===== MATRIX ===== */
 
 const canvas=document.getElementById("matrix");
 const ctx=canvas.getContext("2d");
+
 canvas.height=window.innerHeight;
 canvas.width=window.innerWidth;
+
 const letters="01";
 const fontSize=14;
 const columns=canvas.width/fontSize;
+
 const drops=[];
-for(let x=0;x<columns;x++) drops[x]=1;
+for(let i=0;i<columns;i++) drops[i]=1;
 
 function draw(){
-  ctx.fillStyle="rgba(0,0,0,0.05)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="#0F0";
-  ctx.font=fontSize+"px monospace";
-  for(let i=0;i<drops.length;i++){
-    const text=letters.charAt(Math.floor(Math.random()*letters.length));
-    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-    if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
-      drops[i]=0;
-    drops[i]++;
-  }
+
+    ctx.fillStyle="rgba(0,0,0,0.05)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle="#00ff00";
+    ctx.font=fontSize+"px monospace";
+
+    for(let i=0;i<drops.length;i++){
+
+        const text=letters.charAt(Math.floor(Math.random()*letters.length));
+
+        ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+
+        if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
+            drops[i]=0;
+
+        drops[i]++;
+    }
 }
+
 setInterval(draw,33);
 
 /* START */
-movieIntro();
+intro();
 
 });
 </script>

@@ -32,91 +32,105 @@ input {
 <div id="terminal"></div>
 
 <script>
-// 🔐 ΒΑΛΕ ΤΑ ΔΙΚΑ ΣΟΥ ΣΤΟΙΧΕΙΑ ΕΔΩ
-const SUPABASE_URL = "https://cxkagetcsfcgmdulsmqs.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4a2FnZXRjc2ZjZ21kdWxzbXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjY3MjgsImV4cCI6MjA4NzcwMjcyOH0.0e7oIHreYOjZEST4sf0bjn3hI2uzieT8SKAbp-8z2Fw";
+document.addEventListener("DOMContentLoaded", function () {
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const terminal = document.getElementById("terminal");
 
-const terminal = document.getElementById("terminal");
+  // 🔐 ΒΑΛΕ ΤΑ ΔΙΚΑ ΣΟΥ ΣΤΟΙΧΕΙΑ
+  const SUPABASE_URL = https://cxkagetcsfcgmdulsmqs.supabase.co;
+  const SUPABASE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4a2FnZXRjc2ZjZ21kdWxzbXFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjY3MjgsImV4cCI6MjA4NzcwMjcyOH0.0e7oIHreYOjZEST4sf0bjn3hI2uzieT8SKAbp-8z2Fw;
 
-function typeText(text, callback) {
-  let i = 0;
-  const interval = setInterval(() => {
-    terminal.innerHTML += text.charAt(i);
-    i++;
-    if (i >= text.length) {
-      clearInterval(interval);
-      if (callback) callback();
-    }
-  }, 40);
-}
+  if (!window.supabase) {
+    terminal.innerHTML = "ERROR LOADING DATABASE LIBRARY.";
+    return;
+  }
 
-function askPassword() {
-  terminal.innerHTML += "\n\nENTER ACCESS CODE: ";
-  
-  const input = document.createElement("input");
-  document.body.appendChild(input);
-  input.focus();
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
-  input.addEventListener("keydown", function(e) {
-    if (e.key === "Enter") {
-      if (input.value === "2106") {
-        input.remove();
-        showInfo();
-      } else {
-        terminal.innerHTML += "\nACCESS DENIED.";
-        input.value = "";
+  function typeText(text, callback) {
+    let i = 0;
+    const interval = setInterval(() => {
+      terminal.innerHTML += text.charAt(i);
+      i++;
+      if (i >= text.length) {
+        clearInterval(interval);
+        if (callback) callback();
       }
-    }
-  });
-}
+    }, 35);
+  }
 
-function showInfo() {
-  terminal.innerHTML += "\n\nACCESS GRANTED.\n";
-  
-  typeText(
+  function askPassword() {
+    terminal.innerHTML += "\n\nENTER ACCESS CODE: ";
+
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    input.focus();
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        if (input.value === "2106") {
+          input.remove();
+          showInfo();
+        } else {
+          terminal.innerHTML += "\nACCESS DENIED.";
+          input.value = "";
+        }
+      }
+    });
+  }
+
+  function showInfo() {
+    terminal.innerHTML += "\n\nACCESS GRANTED.\n";
+
+    typeText(
 `\n> DATE: 21.06.2026
 > LOCATION: CLASSIFIED
 > STATUS: INVITATION PENDING
 
 \nENTER YOUR EMAIL TO CONFIRM ACCESS:
-`, 
-  askEmail);
-}
+`,
+      askEmail
+    );
+  }
 
-function askEmail() {
-  const emailInput = document.createElement("input");
-  document.body.appendChild(emailInput);
-  emailInput.focus();
+  function askEmail() {
+    const emailInput = document.createElement("input");
+    document.body.appendChild(emailInput);
+    emailInput.focus();
 
-  emailInput.addEventListener("keydown", async function(e) {
-    if (e.key === "Enter") {
-      const email = emailInput.value;
+    emailInput.addEventListener("keydown", async function (e) {
+      if (e.key === "Enter") {
+        const email = emailInput.value.trim();
 
-      if (!email.includes("@")) {
-        terminal.innerHTML += "\nINVALID EMAIL FORMAT.";
-        return;
+        if (!email.includes("@")) {
+          terminal.innerHTML += "\nINVALID EMAIL FORMAT.";
+          return;
+        }
+
+        terminal.innerHTML += "\n\nSTORING DATA...";
+
+        const { error } = await supabaseClient
+          .from("emails")
+          .insert([{ email: email }]);
+
+        if (error) {
+          terminal.innerHTML += "\nDATABASE ERROR.";
+          console.error(error);
+        } else {
+          terminal.innerHTML += "\nEMAIL STORED SUCCESSFULLY.";
+        }
+
+        emailInput.remove();
       }
+    });
+  }
 
-      terminal.innerHTML += "\n\nSTORING DATA...";
+  typeText("INITIALIZING SYSTEM...\nACCESS RESTRICTED.", askPassword);
 
-      const { error } = await supabase
-        .from("emails")
-        .insert([{ email: email }]);
-
-      if (error) {
-        terminal.innerHTML += "\nERROR SAVING DATA.";
-      } else {
-        terminal.innerHTML += "\nEMAIL STORED SUCCESSFULLY.";
-      }
-
-      emailInput.remove();
-    }
-  });
-}
-
-typeText("INITIALIZING SYSTEM...\nACCESS RESTRICTED.", askPassword);
+});
 </script>
 
 </body>
